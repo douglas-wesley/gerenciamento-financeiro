@@ -1,5 +1,7 @@
 package com.example.Gerenciamento_Financeiro.controller;
 
+import com.example.Gerenciamento_Financeiro.dto.ContaRequestDTO;
+import com.example.Gerenciamento_Financeiro.dto.ContaResponseDTO;
 import com.example.Gerenciamento_Financeiro.model.Conta;
 import com.example.Gerenciamento_Financeiro.services.ContaServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +21,14 @@ public class ContaController {
     }
 
     @PostMapping("/criar")
-    public ResponseEntity<Conta> criaConta(@RequestBody Conta conta) {
-        Conta novaConta = contaServices.criaConta(conta);
+    public ResponseEntity<ContaResponseDTO> criaConta(@RequestBody ContaRequestDTO dto) {
+        ContaResponseDTO novaConta = contaServices.criaConta(dto);
         return ResponseEntity.status(201).body(novaConta);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Conta> getContaById(@PathVariable Long id){
-        Conta conta = contaServices.getContaById(id);
+    public ResponseEntity<ContaResponseDTO> getContaById(@PathVariable Long id){
+        ContaResponseDTO conta = contaServices.getContaById(id);
         return ResponseEntity.ok(conta);
     }
 

@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "tb_conta")
 @AllArgsConstructor
@@ -22,6 +24,6 @@ public class Conta {
     private Long id;
     private String nomeBanco;
     private String nomeTitular;
-    private String numeroConta;
-    private Double saldo;
+    private Integer numeroConta;
+    private BigDecimal saldo;
 }
