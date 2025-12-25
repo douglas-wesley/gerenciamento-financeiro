@@ -35,6 +35,8 @@ public class ContaServices implements IContaServices {
         conta.setNomeTitular(dto.getNomeTitular());
         conta.setNumeroConta(dto.getNumeroConta());
         conta.setSaldo(dto.getSaldo());
+        conta.setEmail(dto.getEmail());
+        conta.setSenha(dto.getSenha());
 
         Conta novaConta = repository.save(conta);
 
@@ -43,6 +45,7 @@ public class ContaServices implements IContaServices {
                 novaConta.getNomeBanco(),
                 novaConta.getNomeTitular(),
                 novaConta.getNumeroConta(),
+                novaConta.getEmail(),
                 novaConta.getSaldo()
         );
 
@@ -57,6 +60,7 @@ public class ContaServices implements IContaServices {
                 conta.getNomeBanco(),
                 conta.getNomeTitular(),
                 conta.getNumeroConta(),
+                conta.getEmail(),
                 conta.getSaldo()
         );
     }
@@ -94,6 +98,7 @@ public class ContaServices implements IContaServices {
                 contaAtualizada.getNomeBanco(),
                 contaAtualizada.getNomeTitular(),
                 contaAtualizada.getNumeroConta(),
+                contaAtualizada.getEmail(),
                 contaAtualizada.getSaldo()
         );
     }

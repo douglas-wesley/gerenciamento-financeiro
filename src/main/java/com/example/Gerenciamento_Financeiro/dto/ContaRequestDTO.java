@@ -11,5 +11,7 @@ public class ContaRequestDTO {
     private String nomeBanco;
     private String nomeTitular;
     private Integer numeroConta;
+    private String email;
+    private String senha;
     private BigDecimal saldo;
 }
