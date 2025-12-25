@@ -34,4 +34,9 @@ public class TransacaoController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/atualizar/{id}")
+    public ResponseEntity<TransacaoResponseDTO> updateTransacaoById(@PathVariable Long id, @RequestBody TransacaoRequestDTO dto){
+        TransacaoResponseDTO updatedDto = services.updateTransacao(id, dto);
+        return ResponseEntity.ok(updatedDto);
+    }
 }
