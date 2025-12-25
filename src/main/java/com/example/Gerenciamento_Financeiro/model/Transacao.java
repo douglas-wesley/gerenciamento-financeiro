@@ -9,6 +9,8 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_transacao")
@@ -23,6 +25,18 @@ public class Transacao {
     private Long id;
     private String descricao;
     private BigDecimal valor;
-    private LocalDate data;
+    private LocalDate data; // Talvez instanceie isso na criação do objeto
     private Tipo tipo;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "conta_id")
+    private Conta conta;
+
+    @ManyToMany
+    @JoinTable(
+        name = "transacao_categoria",
+        joinColumns = @JoinColumn(name = "transacao_id"),
+        inverseJoinColumns = @JoinColumn(name = "categoria_id")
+    )
+    private List<Categoria> categorias = new ArrayList<>();
 }
