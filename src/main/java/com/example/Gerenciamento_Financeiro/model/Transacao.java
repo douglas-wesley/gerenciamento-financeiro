@@ -38,5 +38,20 @@ public class Transacao {
         joinColumns = @JoinColumn(name = "transacao_id"),
         inverseJoinColumns = @JoinColumn(name = "categoria_id")
     )
-    private List<Categoria> categorias = new ArrayList<>();
+    private List<Categoria> categorias;
+
+    public void adicionarCategoria(Categoria categoria) {
+        if (this.categorias == null) {
+            this.categorias = new ArrayList<>();
+        }
+        this.categorias.add(categoria);
+        categoria.getTransacoes().add(this);
+    }
+
+    public void removerCategoria(Categoria categoria) {
+        if (this.categorias != null) {
+            this.categorias.remove(categoria);
+            categoria.getTransacoes().remove(this);
+        }
+    }
 }
