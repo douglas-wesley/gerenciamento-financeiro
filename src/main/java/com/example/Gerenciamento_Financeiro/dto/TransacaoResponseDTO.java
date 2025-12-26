@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -20,4 +21,6 @@ public class TransacaoResponseDTO {
     private BigDecimal valor;
     private LocalDate data;
     private String tipo;
+    private Long contaId;
+    private List<Long> categoriasIds;
 }

@@ -4,18 +4,19 @@ import com.example.Gerenciamento_Financeiro.dto.ContaRequestDTO;
 import com.example.Gerenciamento_Financeiro.dto.ContaResponseDTO;
 import com.example.Gerenciamento_Financeiro.model.Conta;
 import com.example.Gerenciamento_Financeiro.repository.ContaRepository;
+import com.example.Gerenciamento_Financeiro.services.interfaces.IContaServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
 @Service
-public class ContaServices {
+public class ContaServices implements IContaServices {
 
     @Autowired
     private ContaRepository repository;
 
-    // Ver isso na requisição, pois a exception não esta sendo ativa
+    @Override
     public ContaResponseDTO criaConta(ContaRequestDTO dto){ // ajustar as regras de negocio aqui também
         // Verificar se a conta já existe
         if (repository.existsByNumeroConta(dto.getNumeroConta())){
@@ -34,6 +35,8 @@ public class ContaServices {
         conta.setNomeTitular(dto.getNomeTitular());
         conta.setNumeroConta(dto.getNumeroConta());
         conta.setSaldo(dto.getSaldo());
+        conta.setEmail(dto.getEmail());
+        conta.setSenha(dto.getSenha());
 
         Conta novaConta = repository.save(conta);
 
@@ -42,11 +45,14 @@ public class ContaServices {
                 novaConta.getNomeBanco(),
                 novaConta.getNomeTitular(),
                 novaConta.getNumeroConta(),
+                novaConta.getEmail(),
                 novaConta.getSaldo()
         );
 
     }
 
+
+    @Override
     public ContaResponseDTO getContaById(Long id){
         Conta conta = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Conta não existe.")); // Ajustar o status para 404
         return new ContaResponseDTO(
@@ -54,10 +60,13 @@ public class ContaServices {
                 conta.getNomeBanco(),
                 conta.getNomeTitular(),
                 conta.getNumeroConta(),
+                conta.getEmail(),
                 conta.getSaldo()
         );
     }
 
+
+    @Override
     public void deleteContaById(Long id){
         if (!repository.existsById(id)){
             throw new IllegalArgumentException("Conta não existe."); // Ajustar o status para 404
@@ -66,6 +75,7 @@ public class ContaServices {
         }
     }
 
+    @Override
     public ContaResponseDTO updateContaById(Long id, ContaRequestDTO dto){
         Conta contaExistente = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Conta não existe.")); // Ajustar o status para 404
 
@@ -88,6 +98,7 @@ public class ContaServices {
                 contaAtualizada.getNomeBanco(),
                 contaAtualizada.getNomeTitular(),
                 contaAtualizada.getNumeroConta(),
+                contaAtualizada.getEmail(),
                 contaAtualizada.getSaldo()
         );
     }

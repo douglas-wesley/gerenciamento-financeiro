@@ -16,5 +16,6 @@ public class ContaResponseDTO {
     private String nomeBanco;
     private String nomeTitular;
     private Integer numeroConta;
+    private String email;
     private BigDecimal saldo;
 }
