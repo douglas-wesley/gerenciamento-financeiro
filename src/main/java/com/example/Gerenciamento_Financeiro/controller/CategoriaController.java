@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/categorias")
 public class CategoriaController {
 
-    @Autowired
-    private CategoriaServices services;
+    private final CategoriaServices services;
+
+    public CategoriaController(CategoriaServices services) {
+        this.services = services;
+    }
 
     @GetMapping("/hello")
     public String hello() {

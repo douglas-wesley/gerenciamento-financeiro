@@ -12,8 +12,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/contas")
 public class ContaController {
 
-    @Autowired
-    private ContaServices contaServices;
+
+    private final ContaServices services;
+
+    public ContaController(ContaServices services) {
+        this.services = services;
+    }
 
     @GetMapping("/hello")
     public String hello() {
@@ -22,25 +26,25 @@ public class ContaController {
 
     @PostMapping("/criar")
     public ResponseEntity<ContaResponseDTO> criaConta(@RequestBody ContaRequestDTO dto) {
-        ContaResponseDTO novaConta = contaServices.criaConta(dto);
+        ContaResponseDTO novaConta = services.criaConta(dto);
         return ResponseEntity.status(201).body(novaConta);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ContaResponseDTO> getContaById(@PathVariable Long id){
-        ContaResponseDTO conta = contaServices.getContaById(id);
+        ContaResponseDTO conta = services.getContaById(id);
         return ResponseEntity.ok(conta);
     }
 
     @DeleteMapping("/{id}") // Criar uma exception para isso
     public ResponseEntity<Void> deleteContaById(@PathVariable Long id){
-        contaServices.deleteContaById(id);
+        services.deleteContaById(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/atualizar/{id}")
     public ResponseEntity<ContaResponseDTO> updateContaById(@PathVariable Long id, @RequestBody ContaRequestDTO dto) {
-        ContaResponseDTO contaAtualizada = contaServices.updateContaById(id, dto);
+        ContaResponseDTO contaAtualizada = services.updateContaById(id, dto);
         return ResponseEntity.ok(contaAtualizada);
     }
 }

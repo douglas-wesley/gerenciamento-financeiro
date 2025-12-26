@@ -13,8 +13,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/transacoes")
 public class TransacaoController {
 
-    @Autowired
-    private TransacaoServices services;
+
+    private final TransacaoServices services;
+
+    public TransacaoController(TransacaoServices services) {
+        this.services = services;
+    }
 
     @PostMapping("/criar")
     public ResponseEntity<TransacaoResponseDTO> criaTransacao(@RequestBody TransacaoRequestDTO dto) {
