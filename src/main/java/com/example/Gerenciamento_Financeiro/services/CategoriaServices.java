@@ -5,28 +5,41 @@ import com.example.Gerenciamento_Financeiro.dto.CategoriaResponseDTO;
 import com.example.Gerenciamento_Financeiro.model.Categoria;
 import com.example.Gerenciamento_Financeiro.repository.CategoriaRepository;
 import com.example.Gerenciamento_Financeiro.services.interfaces.ICategoriaServices;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class CategoriaServices implements ICategoriaServices {
 
-    @Autowired
-    private CategoriaRepository repository;
+
+    private final CategoriaRepository repository;
+
+    public CategoriaServices(CategoriaRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
+    @Transactional
     public CategoriaResponseDTO criaCategoria(CategoriaRequestDTO dto) {
         // Definir as regras de negócio básica
+
+        if (dto == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Os dados da conta não podem ser nulos.");
+        }
+
         if (dto.getNomeCategoria() == null || dto.getNomeCategoria().isEmpty()) { // Ajeitar no Banco de dados
-            throw new IllegalArgumentException("O nome da categoria não pode ser vazio.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"O nome da categoria não pode ser vazio.");
         }
 
         if (dto.getCor() == null) { // Ajeitar no banco de dados
-            throw new IllegalArgumentException("A cor da categoria não pode ser vazia.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"A cor da categoria não pode ser vazia.");
         }
 
         if (repository.existsByNomeCategoria(dto.getNomeCategoria())){
-            throw new IllegalArgumentException("Já existe uma categoria com esse nome.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Já existe uma categoria com esse nome.");
         }
 
         Categoria categoria = new Categoria();
@@ -44,7 +57,7 @@ public class CategoriaServices implements ICategoriaServices {
 
     @Override
     public CategoriaResponseDTO getCategoriaById(Long id) {
-        Categoria categoria = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Categoria não existe."));
+        Categoria categoria = repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Categoria não existe."));
         return new CategoriaResponseDTO(
                 categoria.getId(),
                 categoria.getNomeCategoria(),
@@ -53,28 +66,34 @@ public class CategoriaServices implements ICategoriaServices {
     }
 
     @Override
+    @Transactional
     public void deleteCategoriaById(Long id) {
         if (!repository.existsById(id)){
-            throw new IllegalArgumentException("Categoria não existe.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Categoria não existe.");
         } else {
             repository.deleteById(id);
         }
     }
 
     @Override
+    @Transactional
     public CategoriaResponseDTO updateCategoriaById(Long id, CategoriaRequestDTO dto) {
+        if (dto == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Os dados da categoria não podem ser nulos.");
+        }
+
         Categoria categoria = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Categoria não existe."));
 
         if (dto.getCor() == null) {
-            throw new IllegalArgumentException("A cor da categoria não pode ser vazia.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"A cor da categoria não pode ser vazia.");
         }
 
         if (dto.getNomeCategoria() == null || dto.getNomeCategoria().isEmpty()) {
-            throw new IllegalArgumentException("O nome da categoria não pode ser vazio.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"O nome da categoria não pode ser vazio.");
         }
 
         if (repository.existsByNomeCategoria(dto.getNomeCategoria())){
-            throw new IllegalArgumentException("Já existe uma categoria com esse nome.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Já existe uma categoria com esse nome.");
         }
 
 
