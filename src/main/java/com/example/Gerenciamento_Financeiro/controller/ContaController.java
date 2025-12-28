@@ -19,17 +19,7 @@ public class ContaController {
         this.services = services;
     }
 
-    @GetMapping("/hello")
-    public String hello() {
-        return "Hello, Contas!";
-    }
-
-    @PostMapping("/criar")
-    public ResponseEntity<ContaResponseDTO> criaConta(@RequestBody ContaRequestDTO dto) {
-        ContaResponseDTO novaConta = services.criaConta(dto);
-        return ResponseEntity.status(201).body(novaConta);
-    }
-
+    // Retirar devido ao login
     @GetMapping("/{id}")
     public ResponseEntity<ContaResponseDTO> getContaById(@PathVariable Long id){
         ContaResponseDTO conta = services.getContaById(id);
