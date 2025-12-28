@@ -24,11 +24,12 @@ public class Conta {
     private String nomeBanco;
     private String nomeTitular;
     private Integer numeroConta;
+
+    @Column(unique = true)
     private String email;
     private String senha; // Fazer autenticação posteriormente
     private BigDecimal saldo;
 
     @OneToMany(mappedBy = "conta", fetch = FetchType.LAZY)
     private List<Transacao> transacoes = new ArrayList<>();
-
 }
