@@ -1,4 +1,4 @@
-package com.example.Gerenciamento_Financeiro.controller;
+package com.example.Gerenciamento_Financeiro.services.exceptions;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

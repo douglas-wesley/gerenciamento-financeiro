@@ -7,6 +7,7 @@ import com.example.Gerenciamento_Financeiro.repository.ContaRepository;
 import com.example.Gerenciamento_Financeiro.services.interfaces.IContaServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -18,9 +19,11 @@ public class ContaServices implements IContaServices {
 
 
     private final ContaRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
-    public ContaServices(ContaRepository repository) {
+    public ContaServices(ContaRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -66,7 +69,7 @@ public class ContaServices implements IContaServices {
         conta.setNumeroConta(dto.getNumeroConta());
         conta.setSaldo(dto.getSaldo());
         conta.setEmail(dto.getEmail());
-        conta.setSenha(dto.getSenha());
+        conta.setSenha(passwordEncoder.encode(dto.getSenha()));
 
         Conta novaConta = repository.save(conta);
 
@@ -135,6 +138,14 @@ public class ContaServices implements IContaServices {
         contaExistente.setNomeTitular(dto.getNomeTitular());
         contaExistente.setNumeroConta(dto.getNumeroConta());
         contaExistente.setSaldo(dto.getSaldo());
+        contaExistente.setEmail(dto.getEmail());
+
+        if (dto.getSenha() != null || !dto.getSenha().isEmpty()){
+            if (dto.getSenha().length() < 6){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A senha deve ter pelo menos 6 caracteres.");
+            }
+            contaExistente.setSenha(passwordEncoder.encode(dto.getSenha()));
+        }
 
         if (dto.getEmail() == null || dto.getEmail().isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email é obrigatório.");

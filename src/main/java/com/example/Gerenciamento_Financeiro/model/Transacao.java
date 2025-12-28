@@ -26,6 +26,8 @@ public class Transacao {
     private String descricao;
     private BigDecimal valor;
     private LocalDate data; // Talvez instanceie isso na criação do objeto
+
+    @Enumerated(EnumType.STRING)
     private Tipo tipo;
 
     @ManyToOne(fetch = FetchType.LAZY)
