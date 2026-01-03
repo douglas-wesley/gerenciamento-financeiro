@@ -59,6 +59,20 @@ public class TransacaoServices implements ITransacaoServices {
         Conta conta = contaRepository.findById(dto.getContaId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Conta não encontrada."));
 
+        BigDecimal saldoAtual = conta.getSaldo() == null ? BigDecimal.ZERO : conta.getSaldo();
+
+        if (dto.getTipo() == Tipo.DESPESA){
+            if (saldoAtual.compareTo(dto.getValor()) < 0){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Saldo insuficiente para realizar a transação");
+            }
+            saldoAtual = saldoAtual.subtract(dto.getValor());
+        } else {
+            saldoAtual = saldoAtual.add(dto.getValor());
+        }
+
+        conta.setSaldo(saldoAtual);
+        contaRepository.save(conta);
+
         Transacao transacao = new Transacao();
         transacao.setDescricao(dto.getDescricao());
         transacao.setValor(dto.getValor());
@@ -86,31 +100,17 @@ public class TransacaoServices implements ITransacaoServices {
 
         Transacao novaTransacao = repository.save(transacao);
 
-        List<Long> categoriasIdsResp = (novaTransacao.getCategorias() != null)
-                ? novaTransacao.getCategorias().stream().map(Categoria::getId).toList()
-                : Collections.emptyList();
-
-
-        return new TransacaoResponseDTO(
-                novaTransacao.getId(),
-                novaTransacao.getDescricao(),
-                novaTransacao.getValor(),
-                novaTransacao.getData(),
-                novaTransacao.getTipo().toString(),
-                conta.getId(),
-                categoriasIdsResp
-        );
+        return toResponseDTO(novaTransacao);
     }
 
     @Override
     @Transactional
     public void deletaTransacao(Long id) {
-
         Transacao transacao = repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Transação não existe.")); // Ajustar o status para 404
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transação não existe."));
 
         if (transacao.getData().isBefore(LocalDate.now().minusMonths(6))) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Transação com mais de 6 meses não pode ser deletada.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transação com mais de 6 meses não pode ser deletada.");
         }
 
         Conta conta = transacao.getConta();
@@ -121,27 +121,60 @@ public class TransacaoServices implements ITransacaoServices {
             } else {
                 conta.setSaldo((conta.getSaldo() == null ? BigDecimal.ZERO : conta.getSaldo()).subtract(transacao.getValor()));
             }
+            contaRepository.save(conta);
         }
-        repository.deleteById(id);
 
+        repository.deleteById(id);
     }
 
     @Override
+    @Transactional
     public TransacaoResponseDTO getTransacaoById(Long id){ // Verificar
         Transacao transacao = repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Transação não encontrada."));
-        List<Long> categoriaIds = (transacao.getCategorias() != null)
-                ? transacao.getCategorias().stream().map(Categoria::getId).toList()
-                : Collections.emptyList();
-        return new TransacaoResponseDTO(transacao.getId(),
-                transacao.getDescricao(),
-                transacao.getValor(),
-                transacao.getData(),
-                transacao.getTipo().toString(),
-                transacao.getConta().getId(),
-                categoriaIds);
+        return toResponseDTO(transacao);
     }
 
     // Adicionar um get para todos as transações
+
+    @Override
+    @Transactional
+    public List<TransacaoResponseDTO> getAllTransacoes() {
+        List<Transacao> transacoes = repository.findAll();
+
+        if (transacoes.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Nenhuma transação encontrada.");
+        }
+
+        return transacoes.stream().map(this::toResponseDTO).toList();
+    }
+
+    @Override
+    public List<TransacaoResponseDTO> getAllTransacoesByConta(Long contaId) {
+        Conta conta = contaRepository.findById(contaId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta não encontrada."));
+
+        List<Transacao> transacoes = repository.findAllByConta(conta);
+
+        if (transacoes.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Nenhuma transação encontrada para a conta " + contaId);
+        }
+
+        return transacoes.stream().map(this::toResponseDTO).toList();
+    }
+
+    @Override
+    public List<TransacaoResponseDTO> getAllTransacoesByTipo(Tipo tipo) {
+        List<Transacao> transacoes = repository.findAllByTipo(tipo);
+
+        if (transacoes.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Nenhuma transação do tipo " + tipo + " encontrada.");
+        }
+
+        return transacoes.stream().map(this::toResponseDTO).toList();
+    }
 
     // Ajustar isso
     @Override
@@ -172,7 +205,7 @@ public class TransacaoServices implements ITransacaoServices {
         BigDecimal oldValue = transacao.getValor();
         Tipo oldType = transacao.getTipo();
 
-        if (oldValue != null){
+        if (oldType != null && oldValue != null) {
             if (oldType == Tipo.DESPESA) {
                 conta.setSaldo((conta.getSaldo() == null ? BigDecimal.ZERO : conta.getSaldo()).add(oldValue));
             } else {
@@ -180,15 +213,24 @@ public class TransacaoServices implements ITransacaoServices {
             }
         }
 
-        // Aplicar o impacto da nova transação no saldo da conta
+        BigDecimal newValue = conta.getSaldo();
+
         if (dto.getTipo() == Tipo.DESPESA){
             if (conta.getSaldo() == null || conta.getSaldo().compareTo(dto.getValor()) < 0) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Saldo insuficiente para atualizar a transação.");
             }
-            conta.setSaldo(conta.getSaldo().subtract(dto.getValor()));
+            newValue = newValue.subtract(dto.getValor());
         } else {
-            conta.setSaldo((conta.getSaldo() == null ? BigDecimal.ZERO : conta.getSaldo()).add(dto.getValor()));
+            newValue = newValue.add(dto.getValor());
         }
+
+        if (newValue.compareTo(BigDecimal.ZERO) < 0){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Saldo insuficiente para realizar a transação. Saldo atual: " +
+                            conta.getSaldo() + ", valor da transação: " + dto.getValor());
+        }
+
+        conta.setSaldo(newValue);
 
         transacao.setData(dto.getData());
         transacao.setDescricao(dto.getDescricao());
@@ -211,6 +253,10 @@ public class TransacaoServices implements ITransacaoServices {
         repository.save(transacao);
         contaRepository.save(conta);
 
+        return toResponseDTO(transacao);
+    }
+
+    private TransacaoResponseDTO toResponseDTO(Transacao transacao) {
         List<Long> categoriaIds = (transacao.getCategorias() != null)
                 ? transacao.getCategorias().stream().map(Categoria::getId).toList()
                 : Collections.emptyList();

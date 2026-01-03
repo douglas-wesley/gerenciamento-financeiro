@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/transacoes")
 public class TransacaoController {
@@ -42,5 +44,11 @@ public class TransacaoController {
     public ResponseEntity<TransacaoResponseDTO> updateTransacaoById(@PathVariable Long id, @RequestBody TransacaoRequestDTO dto){
         TransacaoResponseDTO updatedDto = services.updateTransacao(id, dto);
         return ResponseEntity.ok(updatedDto);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<TransacaoResponseDTO>> getAllTransacoes() {
+        List<TransacaoResponseDTO> transacoes = services.getAllTransacoes();
+        return ResponseEntity.ok(transacoes);
     }
 }
