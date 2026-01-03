@@ -23,10 +23,14 @@ public class Conta {
     private Long id;
     private String nomeBanco;
     private String nomeTitular;
+
+    @Column(unique = true)
     private Integer numeroConta;
 
     @Column(unique = true)
     private String email;
+
+    @Column(unique = true)
     private String senha; // Fazer autenticação posteriormente
     private BigDecimal saldo;
 
