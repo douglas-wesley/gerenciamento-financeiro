@@ -5,6 +5,9 @@ import com.example.Gerenciamento_Financeiro.dto.ContaResponseDTO;
 import com.example.Gerenciamento_Financeiro.dto.LoginRequestDTO;
 import com.example.Gerenciamento_Financeiro.dto.LoginResponseDTO;
 import com.example.Gerenciamento_Financeiro.services.ContaServices;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "Autenticação", description = "Endpoints para registro e login de usuários")
 public class AuthController {
 
     private final ContaServices contaServices;
@@ -30,11 +34,17 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @Operation(summary = "Registrar nova conta", description = "Cria uma nova conta de usuário no sistema")
+    @ApiResponse(responseCode = "201", description = "Conta criada com sucesso")
+    @ApiResponse(responseCode = "400", description = "Requisição inválida")
     public ResponseEntity<ContaResponseDTO> register(@RequestBody ContaRequestDTO dto){
         ContaResponseDTO response = contaServices.criaConta(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Operation(summary = "Login de usuário", description = "Autentica um usuário com email e senha")
+    @ApiResponse(responseCode = "200", description = "Login realizado com sucesso")
+    @ApiResponse(responseCode = "401", description = "Credenciais inválidas")
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO dto) {
         try {
