@@ -1,13 +1,12 @@
 package com.example.Gerenciamento_Financeiro.dto;
 
-import com.example.Gerenciamento_Financeiro.model.Conta;
 import com.example.Gerenciamento_Financeiro.model.enums.Tipo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
+
 import java.util.List;
 
 @Data

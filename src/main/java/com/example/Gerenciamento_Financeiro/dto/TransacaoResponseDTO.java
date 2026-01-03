@@ -1,7 +1,6 @@
 package com.example.Gerenciamento_Financeiro.dto;
 
 
-import com.example.Gerenciamento_Financeiro.model.Transacao;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;

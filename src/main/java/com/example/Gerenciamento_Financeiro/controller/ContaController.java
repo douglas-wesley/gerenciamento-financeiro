@@ -2,12 +2,10 @@ package com.example.Gerenciamento_Financeiro.controller;
 
 import com.example.Gerenciamento_Financeiro.dto.ContaRequestDTO;
 import com.example.Gerenciamento_Financeiro.dto.ContaResponseDTO;
-import com.example.Gerenciamento_Financeiro.model.Conta;
 import com.example.Gerenciamento_Financeiro.services.ContaServices;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

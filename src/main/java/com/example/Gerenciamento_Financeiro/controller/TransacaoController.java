@@ -2,13 +2,11 @@ package com.example.Gerenciamento_Financeiro.controller;
 
 import com.example.Gerenciamento_Financeiro.dto.TransacaoRequestDTO;
 import com.example.Gerenciamento_Financeiro.dto.TransacaoResponseDTO;
-import com.example.Gerenciamento_Financeiro.model.Transacao;
 import com.example.Gerenciamento_Financeiro.model.enums.Tipo;
 import com.example.Gerenciamento_Financeiro.services.TransacaoServices;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
