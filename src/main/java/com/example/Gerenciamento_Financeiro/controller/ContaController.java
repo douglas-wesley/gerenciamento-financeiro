@@ -8,10 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/contas")
 public class ContaController {
-
 
     private final ContaServices services;
 
@@ -36,5 +37,11 @@ public class ContaController {
     public ResponseEntity<ContaResponseDTO> updateContaById(@PathVariable Long id, @RequestBody ContaRequestDTO dto) {
         ContaResponseDTO contaAtualizada = services.updateContaById(id, dto);
         return ResponseEntity.ok(contaAtualizada);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ContaResponseDTO>> getAllContas() {
+        List<ContaResponseDTO> contas = services.getAllContas();
+        return ResponseEntity.ok(contas);
     }
 }
