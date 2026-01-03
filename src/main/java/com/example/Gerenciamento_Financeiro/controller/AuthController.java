@@ -31,7 +31,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<ContaResponseDTO> register(@RequestBody ContaRequestDTO dto){
-        ContaResponseDTO response = contaServices.criaConta(dto); // Analisar o serviçe posteriormente
+        ContaResponseDTO response = contaServices.criaConta(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
