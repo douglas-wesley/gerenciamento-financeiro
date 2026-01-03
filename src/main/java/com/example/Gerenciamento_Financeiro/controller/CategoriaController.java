@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/categorias")
 public class CategoriaController {
@@ -16,11 +18,6 @@ public class CategoriaController {
 
     public CategoriaController(CategoriaServices services) {
         this.services = services;
-    }
-
-    @GetMapping("/hello")
-    public String hello() {
-        return "Hello, Categorias!";
     }
 
     @PostMapping("/criar")
@@ -45,5 +42,11 @@ public class CategoriaController {
     public ResponseEntity<CategoriaResponseDTO> updateCategoriaById(@PathVariable Long id, @RequestBody CategoriaRequestDTO dto){
         CategoriaResponseDTO categoriaAtualizada = services.updateCategoriaById(id, dto);
         return ResponseEntity.ok(categoriaAtualizada);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CategoriaResponseDTO>> getAllCategorias() {
+        List<CategoriaResponseDTO> categorias = services.getAllCategorias();
+        return ResponseEntity.ok(categorias);
     }
 }

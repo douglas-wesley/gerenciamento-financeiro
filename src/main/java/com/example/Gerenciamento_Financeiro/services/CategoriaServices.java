@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @Service
 public class CategoriaServices implements ICategoriaServices {
 
@@ -48,21 +50,13 @@ public class CategoriaServices implements ICategoriaServices {
 
         repository.save(categoria);
 
-        return new CategoriaResponseDTO(
-                categoria.getId(),
-                categoria.getNomeCategoria(),
-                categoria.getCor()
-        );
+        return toResponseDTO(categoria);
     }
 
     @Override
     public CategoriaResponseDTO getCategoriaById(Long id) {
         Categoria categoria = repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Categoria não existe."));
-        return new CategoriaResponseDTO(
-                categoria.getId(),
-                categoria.getNomeCategoria(),
-                categoria.getCor()
-        );
+        return toResponseDTO(categoria);
     }
 
     @Override
@@ -73,6 +67,21 @@ public class CategoriaServices implements ICategoriaServices {
         } else {
             repository.deleteById(id);
         }
+    }
+
+    @Override
+    @Transactional
+    public List<CategoriaResponseDTO> getAllCategorias() {
+        List<Categoria> categorias = repository.findAll();
+
+        if (categorias.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nenhuma categoria encontrada.");
+        }
+
+        return categorias.stream()
+                .map(this::toResponseDTO)
+                .toList();
+
     }
 
     @Override
@@ -101,6 +110,10 @@ public class CategoriaServices implements ICategoriaServices {
         categoria.setCor(dto.getCor());
         repository.save(categoria);
 
+        return toResponseDTO(categoria);
+    }
+
+    private CategoriaResponseDTO toResponseDTO(Categoria categoria) {
         return new CategoriaResponseDTO(
                 categoria.getId(),
                 categoria.getNomeCategoria(),

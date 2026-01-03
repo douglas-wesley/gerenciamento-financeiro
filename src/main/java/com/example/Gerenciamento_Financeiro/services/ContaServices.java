@@ -5,6 +5,7 @@ import com.example.Gerenciamento_Financeiro.dto.ContaResponseDTO;
 import com.example.Gerenciamento_Financeiro.model.Conta;
 import com.example.Gerenciamento_Financeiro.repository.ContaRepository;
 import com.example.Gerenciamento_Financeiro.services.interfaces.IContaServices;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -73,14 +75,7 @@ public class ContaServices implements IContaServices {
 
         Conta novaConta = repository.save(conta);
 
-        return new ContaResponseDTO(
-                novaConta.getId(),
-                novaConta.getNomeBanco(),
-                novaConta.getNomeTitular(),
-                novaConta.getNumeroConta(),
-                novaConta.getEmail(),
-                novaConta.getSaldo()
-        );
+        return toResponseDTO(novaConta);
 
     }
 
@@ -88,14 +83,7 @@ public class ContaServices implements IContaServices {
     @Override
     public ContaResponseDTO getContaById(Long id){
         Conta conta = repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Conta não existe.")); // Ajustar o status para 404
-        return new ContaResponseDTO(
-                conta.getId(),
-                conta.getNomeBanco(),
-                conta.getNomeTitular(),
-                conta.getNumeroConta(),
-                conta.getEmail(),
-                conta.getSaldo()
-        );
+        return toResponseDTO(conta);
     }
 
 
@@ -162,14 +150,19 @@ public class ContaServices implements IContaServices {
 
         Conta contaAtualizada = repository.save(contaExistente);
 
-        return new ContaResponseDTO(
-                contaAtualizada.getId(),
-                contaAtualizada.getNomeBanco(),
-                contaAtualizada.getNomeTitular(),
-                contaAtualizada.getNumeroConta(),
-                contaAtualizada.getEmail(),
-                contaAtualizada.getSaldo()
-        );
+        return toResponseDTO(contaAtualizada);
+    }
+
+    @Override
+    @Transactional
+    public List<ContaResponseDTO> getAllContas(){
+        List<Conta> contas = repository.findAll();
+
+        if (contas.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nenhuma conta encontrada.");
+        }
+
+        return contas.stream().map(this::toResponseDTO).toList();
     }
 
     private boolean isValidEmail(String email) {
@@ -204,5 +197,15 @@ public class ContaServices implements IContaServices {
         return true;
     }
 
+    private ContaResponseDTO toResponseDTO(Conta contas) {
+        return new ContaResponseDTO(
+                contas.getId(),
+                contas.getNomeBanco(),
+                contas.getNomeTitular(),
+                contas.getNumeroConta(),
+                contas.getEmail(),
+                contas.getSaldo()
+        );
+    }
 
 }
